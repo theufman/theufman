@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.22.1/full/pyodide.js"></script>
+  </head>
+
+  <body>
+    <p>
+With this program, you may produce a cyclic, symmetric HCD of K_{m x n} for a particular m and n.
+    </p>
+    M:<input id="m" value="" />
+	<br />
+    N:<input id="n" value="" />
+	<br />
+    Print the base paths -- complete, sufficient, or neither (c/s/n):<input id="s" value="" />
+	<br />
+    <button onclick="evaluateBasePaths()">Start</button>
+    <br />
+    Edge Length Chart number?<input id="c" value="" />
+	<br />
+    <button onclick="evaluateChart()">Draw Charts</button>
+    <br />
+    <button onclick="evaluateRestart()">Restart</button>
+    <br />
+    <div>Output:</div>
+    <textarea id="output" style="width: 100%;" rows="100" disabled></textarea>
+
+<script type="text/javascript">
+      const output = document.getElementById("output");
+
+      function addToOutput(s) {
+        output.value += ">>>" + s + "\n";
+      }
+
+      async function evaluateRestart(){
+        location.reload();
+return false;
+      }
+      output.value = "Initializing...\n";
+      // init Pyodide
+      async function main() {
+        let pyodide = await loadPyodide();
+        await pyodide.loadPackage("micropip");
+        const micropip = pyodide.pyimport("micropip");
+        await micropip.install('https://theufman.github.io/cnshcd_schroederm-1.0.0-py3-none-any.whl');
+		await pyodide.runPython(`from cnshcd_schroederm import cnshcd_builder`);
+		await pyodide.runPython(`
+        import sys
+        import io
+        sys.stdout = io.StringIO()`); 
+        output.value += "Ready!\n";
+        return pyodide;
+      }
+      let pyodideReadyPromise = main();
+
+      async function evaluateBasePaths() {
+      output.value="";
+	  const m = document.getElementById("m");
+	  const n = document.getElementById("n");
+    const s = document.getElementById("s");
+	  const runFunction="cnshcd_builder.entrypoint('" + m.value + "','" + n.value + "','" + s.value + "')";
+        let pyodide = await pyodideReadyPromise;
+        try {
+         let output = pyodide.runPython(runFunction);
+         var stdout = pyodide.runPython("sys.stdout.getvalue()");
+		  addToOutput(stdout);
+        } catch (err) {
+          addToOutput(err);
+        }
+      }
+      
+      async function evaluateChart() {
+      const m = document.getElementById("m");
+	    const n = document.getElementById("n");
+      const s = document.getElementById("s");
+      if (s.value==="s"){
+      const c = document.getElementById("c");
+      if(c.value===""){
+        return
+      }
+      let pyodide = await pyodideReadyPromise;
+      output.value="";
+	    const runFunction="cnshcd_builder.displayChart('" + m.value + "','" + n.value + "','" + c.value + "','" + pyodide.globals.get('S')+ "')";
+        try {
+         let output = pyodide.runPython(runFunction);
+         
+         var stdout = pyodide.runPython("sys.stdout.getvalue()");
+		  addToOutput(stdout);
+        } catch (err) {
+          addToOutput(err);
+        }
+        }
+        }
+    </script>
+  </body>
+</html>
