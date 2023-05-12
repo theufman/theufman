@@ -5,22 +5,31 @@
   </head>
 
   <body>
+  <h2> Base Path Generator for Cyclic, Symmetric HCDs of Complete Multipartite Graphs </h2>
     <p>
-With this program, you may produce a cyclic, symmetric HCD of K_{m x n} for a particular m and n.
+This program will, for a specified m and n, produce the base paths giving rise to a cyclic, n-symmetric HCD of K<sub>m&times;n</sub>, the complete, balanced, multipartite graph with m parts, each with n vertices.
     </p>
-    M:<input id="m" value="" />
-	<br />
-    N:<input id="n" value="" />
-	<br />
-    Print the base paths -- complete, sufficient, or neither (c/s/n):<input id="s" value="" />
-	<br />
+	<p>
+	<table border=0>
+		<tr>
+			<td> Input the number of parts (m): </td>
+			<td> <input id="m" value="3" /> </td>
+		</tr>
+		<tr>
+			<td> Input the part size (n): </td>
+			<td> <input id="n" value="5" /> </td>
+		</tr>
+	</table>
+	</p>
+	<p> Select what type of output you would like.
+		<select name="printall" id="printall">
+			<option value="0">Outline how to build the desired decomposition</option>
+			<option value="1">Outline, and show sufficient sets of base paths</option>
+			<option value="2">Outline, and show complete sets of base paths</option>
+		</select>
+	</p>
     <button onclick="evaluateBasePaths()">Start</button>
-    <br />
-    Edge Length Chart number?<input id="c" value="" />
-	<br />
-    <button onclick="evaluateChart()">Draw Charts</button>
-    <br />
-    <button onclick="evaluateRestart()">Restart</button>
+    <button onclick="evaluateRestart()">Reset</button>
     <br />
     <div>Output:</div>
     <textarea id="output" style="width: 100%;" rows="100" disabled></textarea>
@@ -29,7 +38,7 @@ With this program, you may produce a cyclic, symmetric HCD of K_{m x n} for a pa
       const output = document.getElementById("output");
 
       function addToOutput(s) {
-        output.value += ">>>" + s + "\n";
+        output.value += s + "\n";
       }
 
       async function evaluateRestart(){
@@ -42,7 +51,8 @@ return false;
         let pyodide = await loadPyodide();
         await pyodide.loadPackage("micropip");
         const micropip = pyodide.pyimport("micropip");
-        await micropip.install('https://theufman.github.io/cnshcd_schroederm-1.0.0-py3-none-any.whl');
+        // await micropip.install('https://theufman.github.io/cnshcd_schroederm-1.0.0-py3-none-any.whl');
+		 await micropip.install('https://theufman.github.io/cnshcd_schroederm-1.0.1-py3-none-any.whl');
 		await pyodide.runPython(`from cnshcd_schroederm import cnshcd_builder`);
 		await pyodide.runPython(`
         import sys
@@ -57,8 +67,24 @@ return false;
       output.value="";
 	  const m = document.getElementById("m");
 	  const n = document.getElementById("n");
-    const s = document.getElementById("s");
-	  const runFunction="cnshcd_builder.entrypoint('" + m.value + "','" + n.value + "','" + s.value + "')";
+      const pp = document.getElementById("printall");
+
+		switch (printall.value) {
+			case "0":
+				v = "False";
+				s = "True";
+				break;
+			case "1":
+				v = "True";
+				s = "False";
+				break;
+			case "2":
+			default:
+				v = "True";
+				s = "True";
+				break;
+		}
+	  const runFunction="cnshcd_builder.cnshcd_builder(" + m.value + "," + n.value + "," + s + "," + v + ")";
         let pyodide = await pyodideReadyPromise;
         try {
          let output = pyodide.runPython(runFunction);
@@ -69,28 +95,6 @@ return false;
         }
       }
       
-      async function evaluateChart() {
-      const m = document.getElementById("m");
-	    const n = document.getElementById("n");
-      const s = document.getElementById("s");
-      if (s.value==="s"){
-      const c = document.getElementById("c");
-      if(c.value===""){
-        return
-      }
-      let pyodide = await pyodideReadyPromise;
-      output.value="";
-	    const runFunction="cnshcd_builder.displayChart('" + m.value + "','" + n.value + "','" + c.value + "','" + pyodide.globals.get('S')+ "')";
-        try {
-         let output = pyodide.runPython(runFunction);
-         
-         var stdout = pyodide.runPython("sys.stdout.getvalue()");
-		  addToOutput(stdout);
-        } catch (err) {
-          addToOutput(err);
-        }
-        }
-        }
     </script>
   </body>
 </html>
