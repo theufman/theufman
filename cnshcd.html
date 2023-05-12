@@ -6,13 +6,37 @@
 
 <body>
 
-<h2> Base Path Generator for Cyclic, Symmetric HCDs of Complete Multipartite Graphs </h2>
+<h1> Base Path Generator for Cyclic, Symmetric HCDs of Complete Multipartite Graphs </h1>
 
 <p> 
 This program will, for a specified m and n, produce base paths which give rise to a cyclic, n-symmetric HCD of K<sub>m&times;n</sub>, the complete, balanced, multipartite graph with m parts, each with n vertices.
 </p>
 
+<h2> Directions </h2>
+
+<p> 
+Enter the desired values for m and n below.
+Then select how much output you would like:
+</p>
+
+<ul>
+	<li> <b>Outline how to build the desired decomposition.</b>
+	This will identify which constructions need to be used, and in which order, to produce the desired set of base paths. </li>
+	<li> <b>Outline, and show sufficient sets of base paths.</b>
+	This will produce the above outline, along with the sets of base paths, at each stage, which have a length greater than 1. </li>
+	<li> <b>Outline, and show complete sets of base paths.</b>
+	This will produce the above outline, along with the sets of base paths, at each stage, of any length. </li>
+</ul>
+
 <p>
+	Once you make your selections, click "Start" to render the output.
+	Multiple runs will accumulate in the output window.
+	Click "Clear Output" to reset the output window.
+</p>
+
+<h2> Input </h2>
+
+
 <table border=0>
 	<tr>
 		<td> Input the number of parts (m): </td>
@@ -23,7 +47,7 @@ This program will, for a specified m and n, produce base paths which give rise t
 		<td> <input id="n" value="5" /> </td>
 	</tr>
 </table>
-</p>
+
 
 <p> Select what type of output you would like.
 	<select name="printall" id="printall">
@@ -35,10 +59,10 @@ This program will, for a specified m and n, produce base paths which give rise t
 
 <p>
 <button onclick="evaluateBasePaths()">Start</button>
-<button onclick="evaluateRestart()">Reset</button>
+<button onclick="evaluateRestart()">Clear Output</button>
 </p>
 
-<h3> Output </h3>
+<h2> Output </h2>
 
 <p>
 <textarea id="output" style="width: 100%;" rows="100" disabled></textarea>
