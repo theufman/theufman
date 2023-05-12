@@ -1,73 +1,84 @@
 <!doctype html>
 <html>
-  <head>
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.22.1/full/pyodide.js"></script>
-  </head>
+<head>
+	<script src="https://cdn.jsdelivr.net/pyodide/v0.22.1/full/pyodide.js"></script>
+</head>
 
-  <body>
-  <h2> Base Path Generator for Cyclic, Symmetric HCDs of Complete Multipartite Graphs </h2>
-    <p>
+<body>
+
+<h2> Base Path Generator for Cyclic, Symmetric HCDs of Complete Multipartite Graphs </h2>
+
+<p> 
 This program will, for a specified m and n, produce the base paths giving rise to a cyclic, n-symmetric HCD of K<sub>m&times;n</sub>, the complete, balanced, multipartite graph with m parts, each with n vertices.
-    </p>
-	<p>
-	<table border=0>
-		<tr>
-			<td> Input the number of parts (m): </td>
-			<td> <input id="m" value="3" /> </td>
-		</tr>
-		<tr>
-			<td> Input the part size (n): </td>
-			<td> <input id="n" value="5" /> </td>
-		</tr>
-	</table>
-	</p>
-	<p> Select what type of output you would like.
-		<select name="printall" id="printall">
-			<option value="0">Outline how to build the desired decomposition</option>
-			<option value="1">Outline, and show sufficient sets of base paths</option>
-			<option value="2">Outline, and show complete sets of base paths</option>
-		</select>
-	</p>
-    <button onclick="evaluateBasePaths()">Start</button>
-    <button onclick="evaluateRestart()">Reset</button>
-    <br />
-    <div>Output:</div>
-    <textarea id="output" style="width: 100%;" rows="100" disabled></textarea>
+</p>
+
+<p>
+<table border=0>
+	<tr>
+		<td> Input the number of parts (m): </td>
+		<td> <input id="m" value="3" /> </td>
+	</tr>
+	<tr>
+		<td> Input the part size (n): </td>
+		<td> <input id="n" value="5" /> </td>
+	</tr>
+</table>
+</p>
+
+<p> Select what type of output you would like.
+	<select name="printall" id="printall">
+		<option value="0">Outline how to build the desired decomposition</option>
+		<option value="1">Outline, and show sufficient sets of base paths</option>
+		<option value="2">Outline, and show complete sets of base paths</option>
+	</select>
+</p>
+
+<p>
+<button onclick="evaluateBasePaths()">Start</button>
+<button onclick="evaluateRestart()">Reset</button>
+</p>
+
+<h3> Output </h3>
+
+<p>
+<textarea id="output" style="width: 100%;" rows="100" disabled></textarea>
+</p>
 
 <script type="text/javascript">
-      const output = document.getElementById("output");
+	const output = document.getElementById("output");
 
-      function addToOutput(s) {
-        output.value += s + "\n";
-      }
+	function addToOutput(s) {
+		output.value += s + "\n";
+	}
 
-      async function evaluateRestart(){
-        location.reload();
-return false;
-      }
-      output.value = "Initializing...\n";
-      // init Pyodide
-      async function main() {
-        let pyodide = await loadPyodide();
-        await pyodide.loadPackage("micropip");
-        const micropip = pyodide.pyimport("micropip");
-        // await micropip.install('https://theufman.github.io/cnshcd_schroederm-1.0.0-py3-none-any.whl');
-		 await micropip.install('https://theufman.github.io/cnshcd_schroederm-1.0.1-py3-none-any.whl');
+	async function evaluateRestart(){
+		location.reload();
+		return false;
+	}
+
+	output.value = "Initializing...\n";
+	// init Pyodide
+	async function main() {
+		let pyodide = await loadPyodide();
+		await pyodide.loadPackage("micropip");
+		const micropip = pyodide.pyimport("micropip");
+		await micropip.install('https://theufman.github.io/cnshcd_schroederm-1.0.1-py3-none-any.whl');
 		await pyodide.runPython(`from cnshcd_schroederm import cnshcd_builder`);
 		await pyodide.runPython(`
-        import sys
-        import io
-        sys.stdout = io.StringIO()`); 
-        output.value += "Ready!\n";
-        return pyodide;
-      }
-      let pyodideReadyPromise = main();
+		import sys
+		import io
+		sys.stdout = io.StringIO()`); 
+		output.value += "Ready!\n";
+		return pyodide;
+	}
 
-      async function evaluateBasePaths() {
-      output.value="";
-	  const m = document.getElementById("m");
-	  const n = document.getElementById("n");
-      const pp = document.getElementById("printall");
+	let pyodideReadyPromise = main();
+
+	async function evaluateBasePaths() {
+		output.value="";
+		const m = document.getElementById("m");
+		const n = document.getElementById("n");
+		const pp = document.getElementById("printall");
 
 		switch (printall.value) {
 			case "0":
@@ -84,17 +95,17 @@ return false;
 				s = "True";
 				break;
 		}
-	  const runFunction="cnshcd_builder.cnshcd_builder(" + m.value + "," + n.value + "," + s + "," + v + ")";
-        let pyodide = await pyodideReadyPromise;
-        try {
-         let output = pyodide.runPython(runFunction);
-         var stdout = pyodide.runPython("sys.stdout.getvalue()");
-		  addToOutput(stdout);
-        } catch (err) {
-          addToOutput(err);
-        }
-      }
-      
-    </script>
-  </body>
+		
+		const runFunction="cnshcd_builder.cnshcd_builder(" + m.value + "," + n.value + "," + s + "," + v + ")";
+		let pyodide = await pyodideReadyPromise;
+		try {
+			let output = pyodide.runPython(runFunction);
+			var stdout = pyodide.runPython("sys.stdout.getvalue()");
+			addToOutput(stdout);
+		} catch (err) {
+			addToOutput(err);
+		}
+	}
+</script>
+</body>
 </html>
